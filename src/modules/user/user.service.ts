@@ -1,7 +1,7 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
-import { TUpdateProfile } from "./user.interface";
-import { UserStatus } from "../../../generated/prisma/enums";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
+import { TUpdateProfile } from "./user.interface.js";
+import { UserStatus } from "../../../generated/prisma/enums.js";
 
 // Get All Users (Admin only)
 const getAllUsersFromDB = async () => {

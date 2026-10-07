@@ -1,6 +1,6 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
-import { TCreateCategory, TUpdateCategory } from "./category.interface";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
+import { TCreateCategory, TUpdateCategory } from "./category.interface.js";
 
 // Create Category (Admin only)
 const createCategoryIntoDB = async (payload: TCreateCategory) => {

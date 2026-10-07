@@ -1,7 +1,7 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
-import { TCreateRental } from "./rental.interface";
-import { RentalStatus, UserRole } from "../../../generated/prisma/enums";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
+import { TCreateRental } from "./rental.interface.js";
+import { RentalStatus, UserRole } from "../../../generated/prisma/enums.js";
 
 // Create Rental (Customer only)
 const createRentalIntoDB = async (

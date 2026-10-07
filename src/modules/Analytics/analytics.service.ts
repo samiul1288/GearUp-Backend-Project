@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma";
-import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums";
+import { prisma } from "../../lib/prisma.js";
+import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums.js";
 
 const getMetaDataFromDB = async () => {
   // Parallel DB Queries for maximum efficiency

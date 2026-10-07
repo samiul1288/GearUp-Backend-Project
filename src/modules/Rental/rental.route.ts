@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { RentalController } from "./rental.controller";
-import { auth } from "../../middleware/auth";
-import { UserRole } from "../../../generated/prisma/enums";
-import  validateRequest  from "../../middleware/validateRequest";
-import { RentalValidation } from "./rental.validation";
+import { RentalController } from "./rental.controller.js";
+import { auth } from "../../middleware/auth.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
+import  validateRequest  from "../../middleware/validateRequest.js";
+import { RentalValidation } from "./rental.validation.js";
 
 const router = Router();
 

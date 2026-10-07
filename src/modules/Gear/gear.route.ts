@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { GearController } from "./gear.controller";
-import { auth } from "../../middleware/auth";
-import { UserRole } from "../../../generated/prisma/enums";
-import  validateRequest  from "../../middleware/validateRequest";
-import { GearValidation } from "./gear.validation";
+import { GearController } from "./gear.controller.js";
+import { auth } from "../../middleware/auth.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
+import  validateRequest  from "../../middleware/validateRequest.js";
+import { GearValidation } from "./gear.validation.js";
 
 const router = Router();
 

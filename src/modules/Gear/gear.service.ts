@@ -1,6 +1,6 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
-import { TCreateGear, TGearFilterOptions, TUpdateGear } from "./gear.interface";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
+import { TCreateGear, TGearFilterOptions, TUpdateGear } from "./gear.interface.js";
 
 // Create Gear (PROVIDER or ADMIN)
 const createGearIntoDB = async (providerId: string, payload: TCreateGear) => {

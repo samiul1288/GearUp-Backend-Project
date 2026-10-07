@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
-import { catchAsync } from "../../utils/catchAsync";
-import sendResponse  from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync.js";
+import sendResponse  from "../../utils/sendResponse.js";
 
-import { PaymentServices } from "./payment.service";
-import { UserRole } from "../../../generated/prisma/enums";
+import { PaymentServices } from "./payment.service.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
 
 // Create Payment
 const createPayment = catchAsync(async (req: Request, res: Response) => {

@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { UserStatus } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
-import config from "../../config";
-import { TLoginUser } from "./auth.interface";
-import { User } from "../../../generated/prisma/client";
+import { UserStatus } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
+import config from "../../config/index.js";
+import { TLoginUser } from "./auth.interface.js";
+import { User } from "../../../generated/prisma/client.js";
 
 // Register User
 const registerUserIntoDB = async (payload: User) => {

@@ -1,8 +1,8 @@
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
-import AppError from "../../errors/AppError";
+import AppError from "../../errors/AppError.js";
 
-import { TCreateReview, TUpdateReview } from "./review.interface";
+import { TCreateReview, TUpdateReview } from "./review.interface.js";
 
 // Create Review (Customer only)
 const createReviewIntoDB = async (userId: string, payload: TCreateReview) => {

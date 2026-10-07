@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import  sendResponse  from "../../utils/sendResponse";
-import { RentalServices } from "./rental.service";
-import { UserRole } from "../../../generated/prisma/enums";
+import { catchAsync } from "../../utils/catchAsync.js";
+import  sendResponse  from "../../utils/sendResponse.js";
+import { RentalServices } from "./rental.service.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
 
 const createRental = catchAsync(async (req: Request, res: Response) => {
   const customerId = req.user!.id;

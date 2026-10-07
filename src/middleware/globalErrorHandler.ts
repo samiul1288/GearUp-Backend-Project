@@ -1,7 +1,7 @@
 // src/app/middleware/globalErrorHandler.ts
 import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
-import AppError from "../errors/AppError";
+import AppError from "../errors/AppError.js";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;

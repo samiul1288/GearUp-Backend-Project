@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
-import { catchAsync } from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync.js";
 
-import sendResponse from "../../utils/sendResponse";
+import sendResponse from "../../utils/sendResponse.js";
 
-import { ReviewServices } from "./review.service";
+import { ReviewServices } from "./review.service.js";
 
 const createReview = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;

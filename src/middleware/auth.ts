@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { prisma } from "../lib/prisma";
-import AppError from "../errors/AppError";
+import { prisma } from "../lib/prisma.js";
+import AppError from "../errors/AppError.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import config from "../config";
-import { TAuthUser } from "../modules/Auth/auth.interface";
-import { UserRole, UserStatus } from "../../generated/prisma/enums";
+import config from "../config/index.js";
+import { TAuthUser } from "../modules/Auth/auth.interface.js";
+import { UserRole, UserStatus } from "../../generated/prisma/enums.js";
 
 export const auth = (...requiredRoles: UserRole[]) => {
   return async (

@@ -1,4 +1,4 @@
-import { PaymentStatus } from "../../../generated/prisma/enums";
+import { PaymentStatus } from "../../../generated/prisma/enums.js";
 
 export type TCreatePayment = {
   rentalId: string;

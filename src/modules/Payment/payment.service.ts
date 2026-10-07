@@ -1,13 +1,13 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errors/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errors/AppError.js";
 
-import { TCreatePayment, TUpdatePaymentStatus } from "./payment.interface";
+import { TCreatePayment, TUpdatePaymentStatus } from "./payment.interface.js";
 
 import {
   PaymentGateway,
   PaymentStatus,
   UserRole,
-} from "../../../generated/prisma/enums";
+} from "../../../generated/prisma/enums.js";
 
 // Create Payment
 const createPaymentIntoDB = async (userId: string, payload: TCreatePayment) => {

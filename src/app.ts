@@ -1,15 +1,15 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
-import config from "./config";
-import { AuthRoutes } from "./modules/Auth/auth.routes";
-import { UserRoutes } from "./modules/user/user.route";
-import { CategoryRoutes } from "./modules/Category/category.route";
-import { GearRoutes } from "./modules/Gear/gear.route";
-import { RentalRoutes } from "./modules/Rental/rental.route";
-import { ReviewRoutes } from "./modules/Review/review.route";
-import { PaymentRoutes } from "./modules/Payment/payment.route";
-import { AnalyticsRoutes } from "./modules/Analytics/analytics.route";
+import config from "./config/index.js";
+import { AuthRoutes } from "./modules/Auth/auth.routes.js";
+import { UserRoutes } from "./modules/user/user.route.js";
+import { CategoryRoutes } from "./modules/Category/category.route.js";
+import { GearRoutes } from "./modules/Gear/gear.route.js";
+import { RentalRoutes } from "./modules/Rental/rental.route.js";
+import { ReviewRoutes } from "./modules/Review/review.route.js";
+import { PaymentRoutes } from "./modules/Payment/payment.route.js";
+import { AnalyticsRoutes } from "./modules/Analytics/analytics.route.js";
 
 
 const app: Application = express();

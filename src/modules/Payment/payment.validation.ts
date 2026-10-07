@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PaymentStatus } from "../../../generated/prisma/enums";
+import { PaymentStatus } from "../../../generated/prisma/enums.js";
 
 const createPaymentValidationSchema = z.object({
   body: z.object({
