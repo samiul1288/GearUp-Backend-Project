@@ -3,6 +3,8 @@ import { AddressInfo } from "node:net";
 import test from "node:test";
 import app from "../src/app.js";
 import { AuthValidations } from "../src/modules/Auth/auth.validation.js";
+import { CategoryValidation } from "../src/modules/Category/category.validation.js";
+import { createCategorySlug } from "../src/modules/Category/category.utils.js";
 import { PaymentValidation } from "../src/modules/Payment/payment.validation.js";
 import { gearQuerySchema, idParamSchema } from "../src/middleware/requestSchemas.js";
 
@@ -44,6 +46,21 @@ test("gear query validates availability and price ranges", () => {
     gearQuerySchema.safeParse({ query: { isAvailable: "sometimes" } }).success,
     false,
   );
+});
+
+test("category creation accepts the documented body and builds URL-safe slugs", () => {
+  assert.equal(
+    CategoryValidation.createCategoryValidationSchema.safeParse({
+      body: {
+        name: "Camping",
+        description: "Camping and hiking equipment",
+        icon: "https://example.com/camping.png",
+      },
+    }).success,
+    true,
+  );
+  assert.equal(createCategorySlug("Camping & Hiking"), "camping-hiking");
+  assert.equal(createCategorySlug("屋外用品"), "category");
 });
 
 test("routes reject malformed UUIDs and payment requests cannot supply transaction state", () => {

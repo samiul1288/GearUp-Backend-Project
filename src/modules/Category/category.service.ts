@@ -1,6 +1,27 @@
 import { prisma } from "../../lib/prisma.js";
 import AppError from "../../errors/AppError.js";
 import { TCreateCategory, TUpdateCategory } from "./category.interface.js";
+import { createCategorySlug } from "./category.utils.js";
+
+const findAvailableSlug = async (name: string, categoryId?: string) => {
+  const baseSlug = createCategorySlug(name);
+  let slug = baseSlug;
+  let suffix = 2;
+
+  while (true) {
+    const existingCategory = await prisma.category.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!existingCategory || existingCategory.id === categoryId) {
+      return slug;
+    }
+
+    slug = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+};
 
 // Create Category (Admin only)
 const createCategoryIntoDB = async (payload: TCreateCategory) => {
@@ -13,7 +34,10 @@ const createCategoryIntoDB = async (payload: TCreateCategory) => {
   }
 
   const category = await prisma.category.create({
-    data: payload,
+    data: {
+      ...payload,
+      slug: await findAvailableSlug(payload.name),
+    },
   });
 
   return category;
@@ -75,7 +99,12 @@ const updateCategoryInDB = async (
 
   const updatedCategory = await prisma.category.update({
     where: { id: categoryId },
-    data: payload,
+    data: {
+      ...payload,
+      ...(payload.name && payload.name !== category.name
+        ? { slug: await findAvailableSlug(payload.name, categoryId) }
+        : {}),
+    },
   });
 
   return updatedCategory;
