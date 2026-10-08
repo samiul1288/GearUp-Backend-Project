@@ -107,6 +107,21 @@ test("HTTP app serves health and structured 404 and malformed-body errors", asyn
       errorDetails: [],
     });
 
+    const invalidToken = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: { Authorization: "Bearer invalid-token" },
+    });
+    assert.equal(invalidToken.status, 401);
+    assert.deepEqual(await invalidToken.json(), {
+      success: false,
+      message: "Invalid access token. Please log in again.",
+      errorDetails: [],
+    });
+
+    const refreshCookieOnly = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: { Cookie: "refreshToken=some-refresh-token" },
+    });
+    assert.equal(refreshCookieOnly.status, 401);
+
     const adminSignup = await fetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

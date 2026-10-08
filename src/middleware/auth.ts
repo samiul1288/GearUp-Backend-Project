@@ -13,18 +13,37 @@ export const auth = (...requiredRoles: UserRole[]) => {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const token =
-        req.headers.authorization?.split(" ")[1] || req.cookies?.refreshToken;
+      const authorization = req.headers.authorization;
+      const token = authorization?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
       if (!token) {
-        throw new AppError(401, "You are not authorized!");
+        throw new AppError(
+          401,
+          "A valid access token is required. Send it as a Bearer token.",
+        );
       }
 
-      // 2. Verify Token
-      const decoded = jwt.verify(
-        token,
-        config.jwt_access_secret as string,
-      ) as JwtPayload & TAuthUser;
+      let decoded: JwtPayload & TAuthUser;
+      try {
+        const verified = jwt.verify(token, config.jwt_access_secret as string);
+        if (
+          typeof verified === "string" ||
+          typeof verified.id !== "string" ||
+          typeof verified.email !== "string" ||
+          !Object.values(UserRole).includes(verified.role as UserRole)
+        ) {
+          throw new AppError(401, "Invalid access token payload.");
+        }
+        decoded = verified as JwtPayload & TAuthUser;
+      } catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+          throw new AppError(401, "Access token has expired. Please log in again.");
+        }
+        if (error instanceof jwt.JsonWebTokenError) {
+          throw new AppError(401, "Invalid access token. Please log in again.");
+        }
+        throw error;
+      }
 
       // 3. Check if User Exists in Database
       const user = await prisma.user.findUnique({
