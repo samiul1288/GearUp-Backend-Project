@@ -228,7 +228,14 @@ const updateRentalStatusInDB = async (
 
     include: {
       gear: true,
-      customer: true,
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      },
     },
   });
 
