@@ -1,0 +1,503 @@
+openapi: 3.1.0
+info:
+  title: GearUp Backend API
+  version: 1.0.0
+  description: |
+    Sports and outdoor equipment rentals. Send JSON unless an endpoint says
+    application/x-www-form-urlencoded. Authenticated routes require a JWT
+    access token as a Bearer token. Public signup supports CUSTOMER and PROVIDER;
+    create the first ADMIN with the documented Prisma seed command.
+servers:
+  - url: https://gear-up-backend-project.vercel.app
+    description: Production
+  - url: http://localhost:5000
+    description: Local development
+tags:
+  - name: Health
+  - name: Authentication
+  - name: Users
+  - name: Categories
+  - name: Gear
+  - name: Rentals
+  - name: Reviews
+  - name: Payments
+  - name: Analytics
+paths:
+  /:
+    get:
+      tags: [Health]
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: API is responding
+  /api/auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a customer or provider
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [CUSTOMER, PROVIDER] }
+                phone: { type: string }
+                address: { type: string }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/Error" }
+  /api/auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login and receive an access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "401": { $ref: "#/components/responses/Error" }
+  /api/auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get the authenticated user profile
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "401": { $ref: "#/components/responses/Error" }
+  /api/users:
+    get:
+      tags: [Users]
+      summary: List users (Admin)
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/users/profile:
+    patch:
+      tags: [Users]
+      summary: Update own profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 2 }
+                phone: { type: string }
+                address: { type: string }
+                avatar: { type: string, format: uri }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get a user profile (authenticated)
+      parameters: [{ $ref: "#/components/parameters/id" }]
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/users/status/{id}:
+    patch:
+      tags: [Users]
+      summary: Change user status (Admin)
+      parameters: [{ $ref: "#/components/parameters/id" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [ACTIVE, BLOCKED, SUSPENDED] }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/categories:
+    get:
+      tags: [Categories]
+      summary: List categories
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Categories]
+      summary: Create a category (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 2 }
+                description: { type: string }
+                icon: { type: string }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /api/categories/{id}:
+    parameters: [{ $ref: "#/components/parameters/id" }]
+    get:
+      tags: [Categories]
+      summary: Get a category
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    patch:
+      tags: [Categories]
+      summary: Update a category (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 2 }
+                description: { type: string }
+                icon: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    delete:
+      tags: [Categories]
+      summary: Delete a category (Admin)
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/gears:
+    get:
+      tags: [Gear]
+      summary: Search and filter public gear
+      security: []
+      parameters:
+        - { name: searchTerm, in: query, schema: { type: string } }
+        - { name: categoryId, in: query, schema: { type: string, format: uuid } }
+        - { name: location, in: query, schema: { type: string } }
+        - { name: brand, in: query, schema: { type: string } }
+        - { name: minPrice, in: query, schema: { type: number, minimum: 0 } }
+        - { name: maxPrice, in: query, schema: { type: number, minimum: 0 } }
+        - { name: isAvailable, in: query, schema: { type: boolean } }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Gear]
+      summary: List gear (Provider or Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, pricePerDay, location, categoryId]
+              properties:
+                title: { type: string }
+                description: { type: string }
+                pricePerDay: { type: number, exclusiveMinimum: 0 }
+                location: { type: string }
+                brand: { type: string }
+                categoryId: { type: string, format: uuid }
+                images: { type: array, items: { type: string, format: uri } }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /api/gears/{id}:
+    parameters: [{ $ref: "#/components/parameters/id" }]
+    get:
+      tags: [Gear]
+      summary: Get gear details
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    patch:
+      tags: [Gear]
+      summary: Update owned gear (Provider) or any gear (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, properties: { title: { type: string }, brand: { type: string }, pricePerDay: { type: number }, isAvailable: { type: boolean } } }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    delete:
+      tags: [Gear]
+      summary: Delete owned gear (Provider) or any gear (Admin)
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/rentals:
+    get:
+      tags: [Rentals]
+      summary: List customer, provider, or admin rentals
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Rentals]
+      summary: Request a rental (Customer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gearId, startDate, endDate]
+              properties:
+                gearId: { type: string, format: uuid }
+                startDate: { type: string, format: date-time }
+                endDate: { type: string, format: date-time }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /api/rentals/{id}:
+    parameters: [{ $ref: "#/components/parameters/id" }]
+    get:
+      tags: [Rentals]
+      summary: Get rental details
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/rentals/{id}/status:
+    patch:
+      tags: [Rentals]
+      summary: Update rental status (Provider or Admin)
+      parameters: [{ $ref: "#/components/parameters/id" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [PENDING, APPROVED, ACTIVE, COMPLETED, CANCELLED, REJECTED] }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/reviews:
+    post:
+      tags: [Reviews]
+      summary: Review completed rental (Customer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gearId, rentalId, rating, comment]
+              properties:
+                gearId: { type: string, format: uuid }
+                rentalId: { type: string, format: uuid }
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                comment: { type: string }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+  /api/reviews/gear/{gearId}:
+    get:
+      tags: [Reviews]
+      summary: List reviews for gear
+      security: []
+      parameters:
+        - name: gearId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/reviews/{id}:
+    parameters: [{ $ref: "#/components/parameters/id" }]
+    patch:
+      tags: [Reviews]
+      summary: Update own review (Customer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, properties: { rating: { type: integer, minimum: 1, maximum: 5 }, comment: { type: string } } }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    delete:
+      tags: [Reviews]
+      summary: Delete own review or any review (Admin)
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/payments:
+    get:
+      tags: [Payments]
+      summary: List related payments
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    post:
+      tags: [Payments]
+      summary: Create an SSLCommerz checkout session for an approved rental
+      description: Returns a checkoutUrl; redirect the customer there. Payment becomes PAID only after server-to-server validation with SSLCommerz.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rentalId]
+              properties:
+                rentalId: { type: string, format: uuid }
+      responses:
+        "201": { $ref: "#/components/responses/Success" }
+        "503": { $ref: "#/components/responses/Error" }
+  /api/payments/{id}:
+    get:
+      tags: [Payments]
+      summary: Get a payment owned by the customer/provider or view as Admin
+      parameters: [{ $ref: "#/components/parameters/id" }]
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/payments/sslcommerz/success:
+    post:
+      tags: [Payments]
+      summary: SSLCommerz success callback
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/sslCallback" }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    get:
+      tags: [Payments]
+      summary: SSLCommerz browser-return callback
+      security: []
+      parameters:
+        - { name: val_id, in: query, required: true, schema: { type: string } }
+        - { name: tran_id, in: query, required: true, schema: { type: string } }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/payments/sslcommerz/ipn:
+    post:
+      tags: [Payments]
+      summary: SSLCommerz IPN callback
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/sslCallback" }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    get:
+      tags: [Payments]
+      summary: SSLCommerz IPN callback
+      security: []
+      parameters:
+        - { name: val_id, in: query, required: true, schema: { type: string } }
+        - { name: tran_id, in: query, required: true, schema: { type: string } }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/payments/sslcommerz/fail:
+    post:
+      tags: [Payments]
+      summary: Record an unsuccessful SSLCommerz attempt
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/sslFailure" }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    get:
+      tags: [Payments]
+      summary: Record an unsuccessful SSLCommerz attempt
+      security: []
+      parameters: [{ name: tran_id, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/payments/sslcommerz/cancel:
+    post:
+      tags: [Payments]
+      summary: Record a cancelled SSLCommerz attempt
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/sslFailure" }
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+    get:
+      tags: [Payments]
+      summary: Record a cancelled SSLCommerz attempt
+      security: []
+      parameters: [{ name: tran_id, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+  /api/analytics/meta:
+    get:
+      tags: [Analytics]
+      summary: Admin dashboard statistics (Admin)
+      responses:
+        "200": { $ref: "#/components/responses/Success" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  requestBodies:
+    sslCallback:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            required: [val_id, tran_id]
+            properties:
+              val_id: { type: string }
+              tran_id: { type: string }
+        application/json:
+          schema:
+            type: object
+            required: [val_id, tran_id]
+            properties:
+              val_id: { type: string }
+              tran_id: { type: string }
+    sslFailure:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            required: [tran_id]
+            properties:
+              tran_id: { type: string }
+        application/json:
+          schema:
+            type: object
+            required: [tran_id]
+            properties:
+              tran_id: { type: string }
+  responses:
+    Success:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { type: boolean, const: true }
+              message: { type: string }
+              data: {}
+    Error:
+      description: Structured API error
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success, message, errorDetails]
+            properties:
+              success: { type: boolean, const: false }
+              message: { type: string }
+              errorDetails:
+                type: array
+                items:
+                  type: object
+                  required: [path, message]
+                  properties:
+                    path: { type: string }
+                    message: { type: string }
+security:
+  - bearerAuth: []

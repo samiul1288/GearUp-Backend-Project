@@ -4,6 +4,7 @@ export type TCreateGear = {
   pricePerDay: number;
   location: string;
   images?: string[];
+  brand?: string;
   categoryId: string;
 };
 
@@ -13,7 +14,8 @@ export type TGearFilterOptions = {
   searchTerm?: string;
   categoryId?: string;
   location?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  isAvailable?: boolean;
+  brand?: string;
+  minPrice?: number | string;
+  maxPrice?: number | string;
+  isAvailable?: boolean | string;
 };

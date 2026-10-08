@@ -5,6 +5,7 @@ import sendResponse  from "../../utils/sendResponse.js";
 
 import { PaymentServices } from "./payment.service.js";
 import { UserRole } from "../../../generated/prisma/enums.js";
+import AppError from "../../errors/AppError.js";
 
 // Create Payment
 const createPayment = catchAsync(async (req: Request, res: Response) => {
@@ -15,7 +16,7 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: "Payment processed successfully",
+    message: "SSLCommerz checkout session created",
     data: result,
   });
 });
@@ -35,25 +36,49 @@ const getPayments = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Update Payment Status
-const updatePaymentStatus = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!id) {
-    throw new Error("Payment ID is required");
+const getPaymentById = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  if (!id || Array.isArray(id)) {
+    throw new AppError(400, "A valid payment ID is required.");
   }
 
-  // Express 5 typing can make params values string | string[]
-  if (Array.isArray(id)) {
-    throw new Error("Invalid Payment ID");
-  }
-
-  const result = await PaymentServices.updatePaymentStatusInDB(id, req.body);
+  const result = await PaymentServices.getPaymentByIdFromDB(
+    id,
+    req.user!.id,
+    req.user!.role,
+  );
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Payment status updated successfully",
+    message: "Payment retrieved successfully",
+    data: result,
+  });
+});
+
+const completeSslCommerzPayment = catchAsync(async (req: Request, res: Response) => {
+  const result = await PaymentServices.verifyAndCompletePayment({
+    valId: req.body.val_id ?? req.query.val_id,
+    transactionId: req.body.tran_id ?? req.query.tran_id,
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment verified successfully",
+    data: result,
+  });
+});
+
+const failSslCommerzPayment = catchAsync(async (req: Request, res: Response) => {
+  const result = await PaymentServices.markPaymentFailed(
+    req.body.tran_id ?? req.query.tran_id,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment failure recorded",
     data: result,
   });
 });
@@ -61,5 +86,7 @@ const updatePaymentStatus = catchAsync(async (req: Request, res: Response) => {
 export const PaymentController = {
   createPayment,
   getPayments,
-  updatePaymentStatus,
+  getPaymentById,
+  completeSslCommerzPayment,
+  failSslCommerzPayment,
 };

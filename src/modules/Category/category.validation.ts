@@ -8,7 +8,7 @@ const createCategoryValidationSchema = z.object({
       .min(2, "Name must be at least 2 characters"),
     description: z.string().optional(),
     icon: z.string().optional(),
-  }),
+  }).strict(),
 });
 
 const updateCategoryValidationSchema = z.object({
@@ -16,7 +16,7 @@ const updateCategoryValidationSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters").optional(),
     description: z.string().optional(),
     icon: z.string().optional(),
-  }),
+  }).strict(),
 });
 
 export const CategoryValidation = {

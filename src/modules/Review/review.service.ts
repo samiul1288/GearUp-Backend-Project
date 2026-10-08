@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma.js";
 import AppError from "../../errors/AppError.js";
 
 import { TCreateReview, TUpdateReview } from "./review.interface.js";
+import { RentalStatus } from "../../../generated/prisma/enums.js";
 
 // Create Review (Customer only)
 const createReviewIntoDB = async (userId: string, payload: TCreateReview) => {
@@ -38,6 +39,10 @@ const createReviewIntoDB = async (userId: string, payload: TCreateReview) => {
   // Check if rental belongs to this gear
   if (rental.gearId !== gearId) {
     throw new AppError(400, "This rental does not belong to this gear!");
+  }
+
+  if (rental.status !== RentalStatus.COMPLETED) {
+    throw new AppError(400, "You can review gear only after the rental is completed.");
   }
 
   // Check if this rental has already been reviewed

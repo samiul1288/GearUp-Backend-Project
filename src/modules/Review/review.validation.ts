@@ -2,13 +2,9 @@ import { z } from "zod";
 
 const createReviewValidationSchema = z.object({
   body: z.object({
-    gearId: z.string({
-      error: "Gear ID is required",
-    }),
+    gearId: z.uuid("Gear ID must be a valid UUID"),
 
-    rentalId: z.string({
-      error: "Rental ID is required",
-    }),
+    rentalId: z.uuid("Rental ID must be a valid UUID"),
 
     rating: z
       .number({
@@ -21,7 +17,7 @@ const createReviewValidationSchema = z.object({
     comment: z.string({
       error: "Comment is required",
     }),
-  }),
+  }).strict(),
 });
 
 const updateReviewValidationSchema = z.object({
@@ -36,7 +32,7 @@ const updateReviewValidationSchema = z.object({
       .optional(),
 
     comment: z.string().optional(),
-  }),
+  }).strict(),
 });
 
 export const ReviewValidation = {

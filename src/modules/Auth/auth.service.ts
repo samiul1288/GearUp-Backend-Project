@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { UserStatus } from "../../../generated/prisma/enums.js";
+import { UserRole, UserStatus } from "../../../generated/prisma/enums.js";
 import { prisma } from "../../lib/prisma.js";
 import AppError from "../../errors/AppError.js";
 import config from "../../config/index.js";
@@ -9,6 +9,17 @@ import { User } from "../../../generated/prisma/client.js";
 
 // Register User
 const registerUserIntoDB = async (payload: User) => {
+  if (
+    payload.role &&
+    payload.role !== UserRole.CUSTOMER &&
+    payload.role !== UserRole.PROVIDER
+  ) {
+    throw new AppError(
+      400,
+      "Public registration is limited to customers and providers.",
+    );
+  }
+
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email: payload.email },
@@ -28,6 +39,7 @@ const registerUserIntoDB = async (payload: User) => {
   const result = await prisma.user.create({
     data: {
       ...payload,
+      role: payload.role ?? UserRole.CUSTOMER,
       password: hashedPassword,
     },
     select: {

@@ -4,6 +4,7 @@ model Gear {
   description    String
   pricePerDay    Float
   location       String
+  brand          String?
   images         String[]
   isAvailable    Boolean  @default(true)
   specifications Json?

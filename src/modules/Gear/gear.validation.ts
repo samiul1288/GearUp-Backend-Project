@@ -17,11 +17,10 @@ const createGearValidationSchema = z.object({
     location: z.string(
        "Location is required",
     ),
+    brand: z.string().trim().max(100).optional(),
     images: z.array(z.string().url("Invalid image URL")).optional(),
-    categoryId: z.string(
-      "Category ID is required",
-    ),
-  }),
+    categoryId: z.uuid("Category ID must be a valid UUID"),
+  }).strict(),
 });
 
 const updateGearValidationSchema = z.object({
@@ -30,10 +29,11 @@ const updateGearValidationSchema = z.object({
     description: z.string().optional(),
     pricePerDay: z.number().positive().optional(),
     location: z.string().optional(),
+    brand: z.string().trim().max(100).optional(),
     images: z.array(z.string().url()).optional(),
-    categoryId: z.string().optional(),
+    categoryId: z.uuid().optional(),
     isAvailable: z.boolean().optional(),
-  }),
+  }).strict(),
 });
 
 export const GearValidation = {

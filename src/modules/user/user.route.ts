@@ -4,6 +4,7 @@ import { auth } from "../../middleware/auth.js";
 import { UserRole } from "../../../generated/prisma/enums.js";
 import { UserValidation } from "./user.validation.js";
 import validateRequest from "../../middleware/validateRequest.js";
+import { idParamSchema } from "../../middleware/requestSchemas.js";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.patch(
 router.get(
   "/:id",
   auth(UserRole.ADMIN, UserRole.PROVIDER, UserRole.CUSTOMER),
+  validateRequest(idParamSchema),
   UserController.getUserById,
 );
 
@@ -29,6 +31,7 @@ router.get(
 router.patch(
   "/status/:id",
   auth(UserRole.ADMIN),
+  validateRequest(idParamSchema),
   validateRequest(UserValidation.updateUserStatusValidationSchema),
   UserController.updateUserStatus,
 );

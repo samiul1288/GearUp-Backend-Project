@@ -10,6 +10,8 @@ import { RentalRoutes } from "./modules/Rental/rental.route.js";
 import { ReviewRoutes } from "./modules/Review/review.route.js";
 import { PaymentRoutes } from "./modules/Payment/payment.route.js";
 import { AnalyticsRoutes } from "./modules/Analytics/analytics.route.js";
+import notFoundHandler from "./middleware/notFoundHandler.js";
+import globalErrorHandler from "./middleware/globalErrorHandler.js";
 
 
 const app: Application = express();
@@ -40,5 +42,7 @@ app.use("/api/reviews", ReviewRoutes);
 app.use("/api/payments", PaymentRoutes);
 app.use("/api/analytics", AnalyticsRoutes);
 
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 export default app;

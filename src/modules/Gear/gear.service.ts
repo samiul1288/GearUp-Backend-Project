@@ -36,7 +36,7 @@ const createGearIntoDB = async (providerId: string, payload: TCreateGear) => {
 
 // Get All Gears with Search & Filtering
 const getAllGearsFromDB = async (filters: TGearFilterOptions) => {
-  const { searchTerm, categoryId, location, minPrice, maxPrice, isAvailable } =
+  const { searchTerm, categoryId, location, brand, minPrice, maxPrice, isAvailable } =
     filters;
   const andConditions: any[] = [];
 
@@ -46,6 +46,7 @@ const getAllGearsFromDB = async (filters: TGearFilterOptions) => {
         { title: { contains: searchTerm, mode: "insensitive" } },
         { description: { contains: searchTerm, mode: "insensitive" } },
         { location: { contains: searchTerm, mode: "insensitive" } },
+        { brand: { contains: searchTerm, mode: "insensitive" } },
       ],
     });
   }
@@ -60,6 +61,10 @@ const getAllGearsFromDB = async (filters: TGearFilterOptions) => {
     });
   }
 
+  if (brand) {
+    andConditions.push({ brand: { contains: brand, mode: "insensitive" } });
+  }
+
   if (minPrice !== undefined) {
     andConditions.push({ pricePerDay: { gte: Number(minPrice) } });
   }
@@ -69,7 +74,9 @@ const getAllGearsFromDB = async (filters: TGearFilterOptions) => {
   }
 
   if (isAvailable !== undefined) {
-    andConditions.push({ isAvailable: Boolean(isAvailable) });
+    andConditions.push({
+      isAvailable: isAvailable === true || isAvailable === "true",
+    });
   }
 
   const whereConditions =

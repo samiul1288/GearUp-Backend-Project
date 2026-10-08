@@ -1,29 +1,21 @@
 import { z } from "zod";
-import { UserRole } from "../../../generated/prisma/enums.js";
 
 const registerValidationSchema = z.object({
   body: z.object({
-    name: z.string().min(1, "Name is required"),
-      email: z.
-          email("Invalid email address")
-          .min(1, "Emaill is required"),
-      
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-    role: z
-      .enum([UserRole.CUSTOMER, UserRole.PROVIDER, UserRole.ADMIN])
-      .optional(),
+    name: z.string().trim().min(1, "Name is required"),
+    email: z.email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters long"),
+    role: z.enum(["CUSTOMER", "PROVIDER"]).optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
-  }),
+  }).strict(),
 });
 
 const loginValidationSchema = z.object({
   body: z.object({
-    email: z
-            .email("Invalid email address")
-          .min( 1, "Email is required" ),
-    password: z.string("Password is required"),
-  }),
+    email: z.email("Invalid email address"),
+    password: z.string().min(1, "Password is required"),
+  }).strict(),
 });
 
 export const AuthValidations = {

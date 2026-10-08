@@ -4,6 +4,7 @@ import { auth } from "../../middleware/auth.js";
 import { UserRole } from "../../../generated/prisma/enums.js";
 import  validateRequest  from "../../middleware/validateRequest.js";
 import { GearValidation } from "./gear.validation.js";
+import { gearQuerySchema, idParamSchema } from "../../middleware/requestSchemas.js";
 
 const router = Router();
 
@@ -16,15 +17,16 @@ router.post(
 );
 
 // Get All Gears with filters/search (Public)
-router.get("/", GearController.getAllGears);
+router.get("/", validateRequest(gearQuerySchema), GearController.getAllGears);
 
 // Get Single Gear by ID (Public)
-router.get("/:id", GearController.getGearById);
+router.get("/:id", validateRequest(idParamSchema), GearController.getGearById);
 
 // Update Gear (PROVIDER - Owner only, or ADMIN)
 router.patch(
   "/:id",
   auth(UserRole.PROVIDER, UserRole.ADMIN),
+  validateRequest(idParamSchema),
   validateRequest(GearValidation.updateGearValidationSchema),
   GearController.updateGear,
 );
@@ -33,6 +35,7 @@ router.patch(
 router.delete(
   "/:id",
   auth(UserRole.PROVIDER, UserRole.ADMIN),
+  validateRequest(idParamSchema),
   GearController.deleteGear,
 );
 

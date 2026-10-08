@@ -7,13 +7,13 @@ const updateProfileValidationSchema = z.object({
     phone: z.string().optional(),
     address: z.string().optional(),
     avatar: z.string().url("Avatar must be a valid URL").optional(),
-  }),
+  }).strict(),
 });
 
 const updateUserStatusValidationSchema = z.object({
   body: z.object({
     status: z.enum(UserStatus),
-  }),
+  }).strict(),
 });
 
 export const UserValidation = {

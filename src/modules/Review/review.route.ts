@@ -4,6 +4,7 @@ import { auth } from "../../middleware/auth.js";
 import { UserRole } from "../../../generated/prisma/enums.js";
 import  validateRequest  from "../../middleware/validateRequest.js";
 import { ReviewValidation } from "./review.validation.js";
+import { gearIdParamSchema, idParamSchema } from "../../middleware/requestSchemas.js";
 
 const router = Router();
 
@@ -16,12 +17,17 @@ router.post(
 );
 
 // Get Reviews for a Specific Gear (Public)
-router.get("/gear/:gearId", ReviewController.getGearReviews);
+router.get(
+  "/gear/:gearId",
+  validateRequest(gearIdParamSchema),
+  ReviewController.getGearReviews,
+);
 
 // Update Review (Customer only)
 router.patch(
   "/:id",
   auth(UserRole.CUSTOMER),
+  validateRequest(idParamSchema),
   validateRequest(ReviewValidation.updateReviewValidationSchema),
   ReviewController.updateReview,
 );
@@ -30,6 +36,7 @@ router.patch(
 router.delete(
   "/:id",
   auth(UserRole.CUSTOMER, UserRole.ADMIN),
+  validateRequest(idParamSchema),
   ReviewController.deleteReview,
 );
 
