@@ -16,10 +16,21 @@ import globalErrorHandler from "./middleware/globalErrorHandler.js";
 
 const app: Application = express();
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://gear-up-backend-fornt-end.vercel.app",
+  ...(config.app_url
+    ?.split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean) ?? []),
+];
+
 app.use(
   cors({
-    origin: config.app_url,
+    origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 

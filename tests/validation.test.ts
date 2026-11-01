@@ -99,6 +99,29 @@ test("HTTP app serves health and structured 404 and malformed-body errors", asyn
     assert.equal(health.status, 200);
     assert.equal(await health.text(), "Hello, World!");
 
+    const preflight = await fetch(`${baseUrl}/api/auth/login`, {
+      method: "OPTIONS",
+      headers: {
+        Origin: "http://localhost:3000",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type,authorization",
+      },
+    });
+    assert.equal(preflight.status, 204);
+    assert.equal(
+      preflight.headers.get("access-control-allow-origin"),
+      "http://localhost:3000",
+    );
+    assert.equal(preflight.headers.get("access-control-allow-credentials"), "true");
+    assert.match(
+      preflight.headers.get("access-control-allow-methods") ?? "",
+      /\bPOST\b/,
+    );
+    assert.equal(
+      preflight.headers.get("access-control-allow-headers"),
+      "Content-Type,Authorization",
+    );
+
     const missing = await fetch(`${baseUrl}/no-such-route`);
     assert.equal(missing.status, 404);
     assert.deepEqual(await missing.json(), {
